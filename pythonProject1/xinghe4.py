@@ -141,6 +141,6 @@ if __name__ == '__main__':
             "Cookie": cookie,
             "Referer": i.Referer
         }
-        time_scope('2021-08-18',8,i.post_url,i.运营商)
+        time_scope('2021-08-26',2,i.post_url,i.运营商)
 
-fsdafsdafefwefwefw
+
