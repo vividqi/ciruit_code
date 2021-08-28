@@ -94,7 +94,7 @@ def login_module(line,url,name,password):
         else:
             break
     driver.switch_to.frame('tab账户日消费')
-    for i in range(1,3):
+    for i in range(0,1):
         driver.find_elements_by_name('month')[i].click()
         driver.find_element_by_class_name('x-btn-wrap.x-btn').click()
         time.sleep(5)
