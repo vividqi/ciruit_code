@@ -109,11 +109,11 @@ if __name__ == '__main__':
 
     list2 = ['运营商', '网址', '账号', '密码','防护网','密码2','Referer','post_url']
     df2 = pd.DataFrame(columns=list2)
-    df2.loc[0] = ['星河', 'http://39.98.109.6:9090', '深圳臻信', 'yzWv3RAz','http://39.98.109.6:5101/', 'shenz523','http://39.98.109.6:9090/customer/chs/query-cus-payhistory.html','http://39.98.109.6:9090/customer/WebGetPayHistory']
-    df2.loc[1] = ['金枝', 'http://112.74.44.161:9090/customer/chs/index.html', '易联达', '888888','http://112.74.44.161:5101/','KEN421pzh$@!','http://112.74.44.161:9090/customer/chs/query-cus-payhistory.html','http://112.74.44.161:9090/customer/WebGetPayHistory']
-    df2.loc[2] = ['众信','http://47.107.103.58:9090/chs/','臻信催收61151398','888888','','','http://47.107.103.58:9090/chs/query-cus-payhistory.html','http://47.107.103.58:9090/chs/query-cus-payhistory.jsp']
-    df2.loc[3] = ['小码', 'http://120.79.30.202:7348/customer/chs/index.html', '深圳市云诺信科技全通催收', 'mjjgKGsG','','','http://120.79.30.202:7348/customer/chs/query-cus-payhistory.html','http://120.79.30.202:7348/customer/WebGetPayHistory']
-    df2.loc[4] = ['京蓝宇', 'http://60.10.163.120:3459/chs/', '深圳融臻催收', 'JIsmVpkT','','','http://60.10.163.120:3459/chs/query-cus-payhistory.html','http://60.10.163.120:3459/chs/query-cus-payhistory.jsp']
+    # df2.loc[0] = ['星河', 'http://39.98.109.6:9090', '深圳臻信', 'yzWv3RAz','http://39.98.109.6:5101/', 'shenz523','http://39.98.109.6:9090/customer/chs/query-cus-payhistory.html','http://39.98.109.6:9090/customer/WebGetPayHistory']
+    # df2.loc[1] = ['金枝', 'http://112.74.44.161:9090/customer/chs/index.html', '易联达', '888888','http://112.74.44.161:5101/','KEN421pzh$@!','http://112.74.44.161:9090/customer/chs/query-cus-payhistory.html','http://112.74.44.161:9090/customer/WebGetPayHistory']
+    # df2.loc[2] = ['众信','http://47.107.103.58:9090/chs/','臻信催收61151398','888888','','','http://47.107.103.58:9090/chs/query-cus-payhistory.html','http://47.107.103.58:9090/chs/query-cus-payhistory.jsp']
+    df2.loc[0] = ['小码', 'http://120.79.30.202:7348/customer/chs/index.html', '深圳市云诺信科技全通催收', 'mjjgKGsG','','','http://120.79.30.202:7348/customer/chs/query-cus-payhistory.html','http://120.79.30.202:7348/customer/WebGetPayHistory']
+    # df2.loc[4] = ['京蓝宇', 'http://60.10.163.120:3459/chs/', '深圳融臻催收', 'JIsmVpkT','','','http://60.10.163.120:3459/chs/query-cus-payhistory.html','http://60.10.163.120:3459/chs/query-cus-payhistory.jsp']
     for i in df2.itertuples():
         if i.运营商 == '星河' or i.运营商 == '金枝':
             driver.get(i.防护网)
@@ -127,6 +127,6 @@ if __name__ == '__main__':
             "Cookie": cookie,
             "Referer": i.Referer
         }
-        time_scope('2021-06-01','2021-08-28',i.post_url,i.运营商)
+        time_scope('2021-05-01','2021-08-28',i.post_url,i.运营商)
 
 
