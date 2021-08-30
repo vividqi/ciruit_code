@@ -43,9 +43,10 @@ def login(url,com,password):
             data = v_code()
             driver.find_element_by_id('randCode').clear()
             driver.find_element_by_id('randCode').send_keys(data)
+
             #要注释掉,因为有\n
             # driver.find_element_by_class_name('x-btn-text').click()
-            time.sleep(2)
+            time.sleep(5)
             driver.find_element_by_id('menu-账户话单查询').click()
         except:
             print(i,":验证码错了")
@@ -106,8 +107,8 @@ def time_scope(start_t, days,post_url,cir):
             '套餐费用': Float, '通话类型': NVARCHAR(20), '计费方式': NVARCHAR(20),
             '运营商': NVARCHAR(20), '插入时间': NVARCHAR(30)
         }
-        #插入方式
-        df.to_sql('phone_record', engine, if_exists='append', index=False, dtype=dtypedict)
+        #修改数据库的表
+        df.to_sql('phone_record_test', engine, if_exists='append', index=False, dtype=dtypedict)
         print(cir,i, '运营商有多少行', df.shape[0])
 if __name__ == '__main__':
     conn = pymssql.connect(server="192.168.10.9", user="sj_xudq", password="oQJhkk#53", database="db_danqi")
@@ -135,7 +136,7 @@ if __name__ == '__main__':
             "Cookie": cookie,
             "Referer": i.Referer
         }
-        time_scope('2021-08-26',3,i.post_url,i.运营商)
+        time_scope('2021-08-01',29,i.post_url,i.运营商)
 
 
 
