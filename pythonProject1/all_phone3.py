@@ -10,16 +10,42 @@ import requests
 from sqlalchemy.types import NVARCHAR, Float, Integer, Date, Numeric
 import sys
 import cv2
+import smtplib
+from email.mime.text import MIMEText
+def send_mail(titles,contexts):
+    mail_host = 'smtp.163.com'
+    mail_user = 'dq1601430804'
+    mail_pass = 'TCNLAEMSSJGLUAOH'
+    sender = 'dq1601430804@163.com'
+    receivers = ['xvdanqi@szrongzhen.com']
+    message = MIMEText(contexts,'plain','utf-8')
+    message['Subject'] = titles
+    message['From'] = sender
+    message['To'] = receivers[0]
+    # 授权码 ：TCNLAEMSSJGLUAOH
+    try:
+        smtpObj = smtplib.SMTP()
+        smtpObj.connect(mail_host, 25)
+        smtpObj.login(mail_user, mail_pass)
+        smtpObj.sendmail(sender, receivers, message.as_string())
+        smtpObj.quit()
+        print('send mail success.')
+    except smtplib.SMTPException as e:
+        print('send mail fail. error:', e)
 def v_code():
     img = driver.find_element_by_id('vfcode')
     left = int(img.location['x'])  # 获取图片左上角坐标x
     top = int(img.location['y'])  # 获取图片左上角y
     right = int(img.location['x'] + img.size['width'])  # 获取图片右下角x
     bottom = int(img.location['y'] + img.size['height'])
+    print(left,right,top,bottom)
     path1 = '1.png'
     path2 = '2.png'
     driver.save_screenshot(path1)  # 截取当前窗口并保存图片
     im = Image.open(path1)  # 打开图片
+    # 528 588 285 305 正常 //异常:   528 544 289 305 图片不显示//528 528 305 305  宽和高为0
+    if left == right:
+        return 'vcode error'
     im = im.crop((left, top, right, bottom))  # 截图验证码
     im.save(path2)
     img = cv2.imread(path2, 0)
@@ -32,20 +58,23 @@ def sec_to_clock(sec):
     strr = "%02d:%02d:%02d" % (h, m, s)
     return strr
 def login(url,com,password):
-    time.sleep(0.5)
     driver.get(url)
     driver.find_element_by_id('ext-comp-1008').click()
     driver.find_element_by_xpath("//div[@class='x-combo-list-inner']/div[@class='x-combo-list-item'][1]").click()
     driver.find_element_by_id('terminalName').send_keys(com)
     driver.find_element_by_id('terminalPassword').send_keys(password)
-    for i in range(0, 15):
+    for i in range(0, 20):
         try:
             data = v_code()
             driver.find_element_by_id('randCode').clear()
             driver.find_element_by_id('randCode').send_keys(data)
-
-            #要注释掉,因为有\n
-            # driver.find_element_by_class_name('x-btn-text').click()
+            #异常
+            if (repr(data)==r"'\x0c'"):
+                driver.find_element_by_partial_link_text('换一个').click()
+                continue
+            #要注释掉,因为pytesseract 带有\n,如果是vcode error说明验证码图片异常,导致截图出错
+            if(data == 'vcode error'):
+                driver.find_element_by_class_name('x-btn-text').click()
             time.sleep(5)
             driver.find_element_by_id('menu-账户话单查询').click()
         except:
@@ -61,7 +90,7 @@ def login(url,com,password):
     cookie = driver.get_cookies()[0].get('name') + "=" + driver.get_cookies()[0].get('value')
     return cookie
 def time_scope(start_t, days,post_url,cir):
-    global header
+    global header,num_list
     start_date = datetime.datetime.strptime(start_t, '%Y-%m-%d')
     for j in range(0, days):
         to_date = start_date + datetime.timedelta(days=j)
@@ -108,13 +137,15 @@ def time_scope(start_t, days,post_url,cir):
             '运营商': NVARCHAR(20), '插入时间': NVARCHAR(30)
         }
         #修改数据库的表
-        df.to_sql('phone_record_test', engine, if_exists='append', index=False, dtype=dtypedict)
+        df.to_sql('phone_record', engine, if_exists='append', index=False, dtype=dtypedict)
+        num_list.append(str(df.shape[0]))
         print(cir,i, '运营商有多少行', df.shape[0])
 if __name__ == '__main__':
     conn = pymssql.connect(server="192.168.10.9", user="sj_xudq", password="oQJhkk#53", database="db_danqi")
     engine = create_engine('mssql+pymssql://sj_xudq:oQJhkk#53@192.168.10.9/db_danqi')
     driver = webdriver.Chrome()
-
+    #各项目数量list
+    num_list = []
     list2 = ['运营商', '网址', '账号', '密码','防护网','密码2','Referer','post_url']
     df2 = pd.DataFrame(columns=list2)
     df2.loc[0] = ['星河', 'http://39.98.109.6:9090', '深圳臻信', 'yzWv3RAz','http://39.98.109.6:5101/', 'shenz523','http://39.98.109.6:9090/customer/chs/query-cus-cdr.html','http://39.98.109.6:9090/customer/WebGetCustomerCdr']
@@ -122,7 +153,6 @@ if __name__ == '__main__':
     df2.loc[2] = ['众信','http://47.107.103.58:9090/chs/','臻信催收61151398','888888','','','http://47.107.103.58:9090/chs/query-cus-cdr.html','http://47.107.103.58:9090/chs/query-cus-cdr.jsp']
     df2.loc[3] = ['小码', 'http://120.79.30.202:7348/customer/chs/index.html', '深圳市云诺信科技全通催收', 'mjjgKGsG', '', '', 'http://120.79.30.202:7348/customer/chs/query-cus-cdr.html','http://120.79.30.202:7348/customer/WebGetCustomerCdr']
     df2.loc[4] = ['京蓝宇', 'http://60.10.163.120:3459/chs/', '深圳融臻催收', 'JIsmVpkT','','','http://60.10.163.120:3459/chs/query-cus-cdr.html','http://60.10.163.120:3459/chs/query-cus-cdr.jsp']
-
     for i in df2.itertuples():
         if i.运营商 == '星河' or i.运营商 == '金枝':
             driver.get(i.防护网)
@@ -130,13 +160,23 @@ if __name__ == '__main__':
             current_window = driver.current_window_handle
             driver.find_element_by_id('button').click()
             time.sleep(5)
+        print('开始爬取',i.运营商)
         cookie=login(i.网址, i.账号, i.密码)
         header = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36",
             "Cookie": cookie,
             "Referer": i.Referer
         }
-        time_scope('2021-08-01',29,i.post_url,i.运营商)
+        #修改时间
+        date_start=str(datetime.datetime.now().date()-datetime.timedelta(days=1))
+        print(date_start)
+        time_scope(date_start,1,i.post_url,i.运营商)
+    mail_text = '\n'
+    conn.close()
+    for i in range(0, len(num_list)):
+        mail_text = mail_text + df2.iloc[i, 0] + '爬取的数量：' + num_list[i] + '\n'
+    tit = date_start + '爬取成功'
+    send_mail(tit, mail_text)
 
 
 
