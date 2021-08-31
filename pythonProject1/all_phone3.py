@@ -7,7 +7,7 @@ import pytesseract
 import pymssql
 from sqlalchemy import create_engine
 import requests
-from sqlalchemy.types import NVARCHAR, Float, Integer, Date, Numeric
+from sqlalchemy.types import NVARCHAR, Float
 import sys
 import cv2
 import smtplib
@@ -144,6 +144,9 @@ if __name__ == '__main__':
     conn = pymssql.connect(server="192.168.10.9", user="sj_xudq", password="oQJhkk#53", database="db_danqi")
     engine = create_engine('mssql+pymssql://sj_xudq:oQJhkk#53@192.168.10.9/db_danqi')
     driver = webdriver.Chrome()
+    cur = conn.cursor()
+    cur.execute("select left(MAX(起始时间),10) 最大时间 from db_danqi.dbo.phone_record")
+    max_date = cur.fetchall()
     #各项目数量list
     num_list = []
     list2 = ['运营商', '网址', '账号', '密码','防护网','密码2','Referer','post_url']
@@ -167,10 +170,13 @@ if __name__ == '__main__':
             "Cookie": cookie,
             "Referer": i.Referer
         }
-        #修改时间
-        date_start=str(datetime.datetime.now().date()-datetime.timedelta(days=1))
-        print(date_start)
-        time_scope(date_start,1,i.post_url,i.运营商)
+        # 修改时间
+        #取爬取的最近日期
+        date_start = str((datetime.datetime.strptime(max_date[0][0], '%Y-%m-%d') + datetime.timedelta(days=1)).date())
+        n = int(str(datetime.datetime.now().date() - datetime.datetime.strptime(max_date[0][0], '%Y-%m-%d').date())[0])
+        # date_start=str(datetime.datetime.now().date()-datetime.timedelta(days=1))
+        print(date_start,n-1)
+        time_scope(date_start,n-1,i.post_url,i.运营商)
     mail_text = '\n'
     conn.close()
     for i in range(0, len(num_list)):
