@@ -6,7 +6,6 @@ from PIL import Image
 import re
 import os
 import time
-
 def binarizing(img, threshold):
     """传入image对象进行灰度、二值处理"""
     img = img.convert("L")  # 转灰度
