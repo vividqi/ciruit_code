@@ -6,10 +6,10 @@ from PIL import Image
 import re
 import os
 import time
+
 def binarizing(img, threshold):
     """传入image对象进行灰度、二值处理"""
     img = img.convert("L")  # 转灰度
-
     pixdata = img.load()
     w, h = img.size
     # 遍历所有像素，大于阈值的为黑色
@@ -45,9 +45,7 @@ def v_code(img):
     data2 = data1.replace("|","I")
     data3 = data2.replace("!", "I")
     print(data3)
-
 if __name__ == '__main__':
-  # Z=F
     for i in range(0,100):
         filename = str(i)+'.jpg'
         p = Image.open(filename)
