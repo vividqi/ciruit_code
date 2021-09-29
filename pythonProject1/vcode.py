@@ -30,6 +30,7 @@ def clear_border(img):
             if x < 2 or x > h -2:
                 pixdata[x, y] = 255
     return img
+
 def v_code(img):
     width, height = img.size
     print(img.size)
@@ -45,6 +46,7 @@ def v_code(img):
     data2 = data1.replace("|","I")
     data3 = data2.replace("!", "I")
     print(data3)
+
 if __name__ == '__main__':
     for i in range(0,100):
         filename = str(i)+'.jpg'
